@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Vim
+*~
+*.sw[po]
+
+# Django
+db.sqlite3
+
