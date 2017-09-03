@@ -1,3 +1,6 @@
 django
 django-simple-history
 Pillow
+django-debug-toolbar
+psycopg2
+openpyxl

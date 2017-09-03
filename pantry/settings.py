@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = 'x-xbx!88hfnaa_wnmxe+1g)1o6n=7d3hc_r@x!7f4yyfjc@rzz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -37,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
+    'debug_toolbar',
     'simple_history',
     'clients',
 ]
@@ -49,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
@@ -58,6 +63,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,13 +82,26 @@ WSGI_APPLICATION = 'pantry.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+DATABASE_URL = "postgres://{user}:{passwd}@{host}:{port}/{database}".format(
+        user="pollard", passwd="wtp0llard", host="127.0.0.1", port="5432",
+        database="pantry")
+
+url = urlparse(os.getenv("DATABASE_URL", DATABASE_URL))
+
 DATABASES = {
-    'default': {
+    'local': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+   'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': url.path[1:],
+        'USER': url.username,
+        'PASSWORD': url.password,
+        'HOST': url.hostname,
+        'PORT': url.port,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -114,10 +133,17 @@ USE_I18N = False
 
 USE_L10N = False
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "resources"),
+)
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+

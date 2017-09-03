@@ -5,7 +5,7 @@
 import os
 import sys
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import argparse
 import logging
 
@@ -18,13 +18,15 @@ from openpyxl.utils import coordinate_to_tuple
 
 import django
 django.setup()
-from clients import models
+from clients.models import Person, Client, Visit
 
 # Constants
 CURRENT_SHEET = 'New Data'
 NEW_ID_COL = 'New ID #'
 NOTES_COL = 'Notes'
 AGE7_COL = '#7 age'
+FIRST_VISIT = datetime(2017, 1, 7)
+FIRST_VISIT_IDX = 32
 
 # Globals
 dry_run = False
@@ -33,136 +35,7 @@ dry_run = False
 # Classes
 #######################################################################
 
-class Person(object):
-    def __init__(self, last_name=None, first_name=None,
-        name=None, dob=None, gender=None, household=None):
-        if name:
-            last_name, first_name = name.split(',', 1)
-        self.last_name = last_name
-        self.first_name = first_name
-        if dob:
-            self.dob = dob.date()
-        else:
-            self.dob = None
-        if gender:
-            self.gender = gender
-        else:
-            self.gender = ''
-        self.household = household
-        self._id = None
-        self._obj = None
 
-    def __repr__(self):
-        if self.dob:
-            return "<{} {} ({}) b.{}>".format(self.first_name, self.last_name,
-                    self.gender, self.dob.strftime("%b %d, %Y"))
-        else:
-            return "<{} {} ({})>".format(self.first_name, self.last_name, self.gender)
-
-    def __unicode__(self):
-        return self.first_name + " " + self.last_name
-
-    @property
-    def obj(self):
-        """
-        Return the corresponding model object from the database.
-        If there's no database id, a new object will added to the database;
-        otherwise, the existing item is fetched.
-        """
-        if not self._obj:
-            if self._id is not None:
-                self._obj = models.Person.objects.filter(pk=self._id)[0]
-            else:
-                self._obj = models.Person(firstname=self.first_name,
-                        lastname=self.last_name, dob=self.dob,
-                        gender=self.gender, household=self.household.obj)
-                if not dry_run:
-                    self._obj.save()
-                    self._id = self._obj.id
-        return self._obj
-
-    def store(self):
-        self.obj.save()
-
-
-class Client(object):
-    def __init__(self, person=None, newId=None, reg_notes="", notes=""):
-        self.person = person
-        self.reg_notes = reg_notes if reg_notes else ""
-        self.notes = notes if notes else ""
-        self.newId = str(newId) if newId else None
-        self._id = None
-        self._obj = None
-
-    def __repr__(self):
-        return "<client #{} - {}>".format(self.newId, str(self.person))
-
-    def __unicode__(self):
-        return "client {}: {}".format(self.newId, str(self.client))
-
-    @property
-    def obj(self):
-        """
-        Return the corresponding model object from the database.
-        If there's no database id, a new object will added to the database;
-        otherwise, the existing item is fetched.
-        """
-        if not self._obj:
-            if self._id is not None:
-                self._obj = models.Client.objects.filter(pk=self._id)[0]
-            else:
-                self._obj = models.Client(person=self.person.obj,
-                        newId=self.newId, notes=self.notes)
-                if not dry_run:
-                    self._obj.save()
-                    self._id = self._obj.id
-        return self._obj
-
-    def store(self):
-        self.obj.save()
-
-class Household(object):
-    def __init__(self, address=None, city=None, client=None, members=None):
-        self.address = address
-        self.city = city
-        if members:
-            self.members = members
-        else:
-            self.members = []
-        for member in self.members:
-            member.household = self
-        self.client = client
-        if client:
-            client.household = self
-        self._id = None
-        self._obj = None
-
-    def __repr__(self):
-        return "<{} household @ {}, {}>".format(str(self.client), self.address, self.city)
-
-    def __unicode__(self):
-        return str(self.client) + " household"
-
-    @property
-    def obj(self):
-        """
-        Return the corresponding model object from the database.
-        If there's no database id, a new object will added to the database;
-        otherwise, the existing item is fetched.
-        """
-        if not self._obj:
-            if self._id is not None:
-                self._obj = models.Household.objects.filter(pk=self._id)[0]
-            else:
-                self._obj = models.Household(address=self.address,
-                        city=self.city)
-                if not dry_run:
-                    self._obj.save()
-                    self._id = self._obj.id
-        return self._obj
-
-    def store(self):
-        self.obj.save()
 
 
 #######################################################################
@@ -190,13 +63,21 @@ def load_spreadsheet(infile, dryrun=False):
     # Check that expected columns exist
     col_names =  [c[0].value for c in ws.iter_cols(min_row=1, max_row=1)]
     for idx, name in enumerate(col_names):
-        log.debug("column {:2d}: '{}'".format(idx+1, name))
+        log.debug("column {:2d}: '{}'".format(idx, name))
     assert NEW_ID_COL in col_names
     # assert NOTES_COL in col_names
     assert AGE7_COL in col_names
-    newid_idx = col_names.index(NEW_ID_COL) + 1
+    newid_idx = col_names.index(NEW_ID_COL) 
     idNotes_idx = newid_idx + 1
-    distNotes_idx = col_names.index(AGE7_COL) + 2
+    distNotes_idx = col_names.index(AGE7_COL) + 1
+    visit_cols = []
+    for idx in range(FIRST_VISIT_IDX, 500):
+        name = col_names[idx]
+        if not (isinstance(name, datetime) or name.startswith('=')): 
+            break
+        visit_date = FIRST_VISIT + timedelta(7*len(visit_cols))
+        visit_cols.append((idx, visit_date))
+        print("col {}: {}".format(idx, visit_date.strftime("%m/%d/%Y")))
 
     # Load client data, row by row
     for row in ws.iter_rows(min_row=2):
@@ -205,25 +86,47 @@ def load_spreadsheet(infile, dryrun=False):
 
         if not (first_name and last_name):
             break
-        household = Household(address=address, city=city)
-        household.store()
-
         person = Person(last_name=last_name, first_name=first_name,
-                gender=gender, dob=dob, household=household)
-        person.store()
-        log.debug("Loaded client {}".format(person))
+                gender=gender, dob=dob)
+        person.save()
 
         newId = row[newid_idx].value
         idNotes = row[idNotes_idx].value
         distNotes = row[distNotes_idx].value
-        client = Client(person=person, newId=newId, notes=distNotes, reg_notes=idNotes)
-        client.store()
+        client = Client(person=person, address=address, city=city,
+                newId=newId, notes=distNotes, reg_notes=idNotes)
+        client.save()
+
+        household_count = 0
+        for idx in range(6, 27, 3):
+            name, gender, dob = [c.value for c in row[idx:idx+3]]
+            if not name:
+                continue
+            if ',' in name:
+                last_name, first_name = name.split(', ', 1)
+            else:
+                first_name, last_name = name, ""
+            household_count += 1
+            person = Person(last_name=last_name, first_name=first_name,
+                    gender=gender, dob=dob, dependent_on=client)
+            person.save()
+
+        visit_count = 0
+        for idx, visit_date in visit_cols:
+            if row[idx].value:
+                assert row[idx].value.lower() == 'x'
+                visit = Visit(client=client, visited_at=visit_date)
+                visit_count += 1
+                visit.save()
+
+        log.debug("Loaded client {}:\t{}\t{} dependents\t{} visits".format(
+            client.id, client, client.household.count(), visit_count))
+
 
 
 def reset_database():
     Person.objects.all().delete()
     Client.objects.all().delete()
-    Household.objects.all().delete()
     Visit.objects.all().delete()
 
 def parse_args(args):

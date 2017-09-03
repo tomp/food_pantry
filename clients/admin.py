@@ -1,8 +1,16 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
-from .models import Person, Client, Household, Visit
+from .models import Person, Client, Visit
 
-admin.site.register(Person, SimpleHistoryAdmin)
-admin.site.register(Client, SimpleHistoryAdmin)
-admin.site.register(Household, SimpleHistoryAdmin)
-admin.site.register(Visit, SimpleHistoryAdmin)
+
+class DependentInlineAdmin(admin.TabularInline):
+    model = Person
+
+@admin.register(Client)
+class ClientAdmin(SimpleHistoryAdmin):
+    list_display = ('name', 'id_number', 'last_visit', 'notes')
+    inlines = [DependentInlineAdmin]
+
+@admin.register(Visit)
+class VisitAdmin(SimpleHistoryAdmin):
+    date_hierarchy = 'visited_at'
