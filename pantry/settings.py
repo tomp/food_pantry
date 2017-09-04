@@ -16,7 +16,6 @@ from urllib.parse import urlparse
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -26,8 +25,9 @@ SECRET_KEY = 'x-xbx!88hfnaa_wnmxe+1g)1o6n=7d3hc_r@x!7f4yyfjc@rzz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
+SITE_ID = 1
 
 # Application definition
 
@@ -62,7 +62,6 @@ ROOT_URLCONF = 'pantry.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -142,7 +141,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "resources"),
+    os.path.join(BASE_DIR, "assets"),
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+{% load static %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>{{ title }}</title>
+    <!-- Required meta tags for bootstrap -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link href="{% static "directory/base.css" %}" rel="stylesheet" type="text/css">
+{% block styles %}
+{% endblock %}
+{% block scripts %}
+{% endblock %}
+  </head>
+  <!--
+  <body background="{% static "directory/images/bg.gif" %}">
+   -->
+  <body>
+      <div id="banner" class="container">
+          <div class="span12">
+          <div class="banner-title">
+          <h1>Our Lady of Sorrows School Directory</h1>
+          </div>
+          </div>
+      </div>
+      <div class="container">
+          <div id="topnavbar" class="navbar navbar-inverse">
+              <div class="navbar-inner">
+                  <ul class="nav">
+                      <li><a href="{{ root_url }}">Home</a></li>
+                      <li><a href="{{ root_url }}contacts/classes/">Classes</a></li>
+                      <li><a href="{{ root_url }}contacts/families/">Families</a></li>
+                      <li><a href="{{ root_url }}contacts/students/">Students</a></li>
+                      <li><a href="{{ root_url }}contacts/adults/">Adults</a></li>
+                  </ul>
+                  <ul class="nav pull-right">
+                      <li><a href="{{ root_url }}admin/">Admin</a></li>
+                  </ul>
+              </div>
+          </div>
+          <div id="sidebar">
+          </div>
+          <div id="content">
+              {% block content %}
+              <p>Hello world!</p>
+              <p>ROOT_URL: {{ root_url }}</p>
+              {% endblock %}
+          </div>
+      </div>
+      <div id="footer" class="container">
+      </div>
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+  </body>
+</html>
