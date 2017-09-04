@@ -2,8 +2,6 @@ from datetime import date
 from django.db import models
 from django.utils import timezone
 
-from simple_history.models import HistoricalRecords
-
 
 class Person(models.Model):
     MALE = 'M'
@@ -34,7 +32,6 @@ class Person(models.Model):
 class Dependent(Person):
     dependent_on = models.ForeignKey('Client', related_name='dependents',
             on_delete=models.CASCADE,null=True)
-    history = HistoricalRecords()
 
 
 class Client(Person):
@@ -61,7 +58,6 @@ class Client(Person):
             blank=True, null=True, help_text="Registration notes")
     notes = models.CharField(default="", max_length=256,
             blank=True, null=True, help_text="General notes")
-    history = HistoricalRecords()
 
     def id_number(self):
         if self.newId:
@@ -86,7 +82,6 @@ class Visit(models.Model):
     client = models.ForeignKey('Client', related_name='visits')
     visited_at = models.DateTimeField(blank=True)
     picked_up_by = models.ForeignKey('Client', related_name='pickups', null=True)
-    history = HistoricalRecords()
 
     def __str__(self):
         return "{} @ {}".format(str(self.client), self.visited_at.strftime("%Y-%m-%d"))
