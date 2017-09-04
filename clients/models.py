@@ -78,10 +78,9 @@ class Client(models.Model):
 
 
 class Visit(models.Model):
-    client = models.ForeignKey('Client')
+    client = models.ForeignKey('Client', related_name='visits')
     visited_at = models.DateTimeField(default=timezone.now)
-    picked_up_by = models.ForeignKey('Client', related_name='proxy_visits',
-            null=True)
+    picked_up_by = models.ForeignKey('Client', null=True)
     history = HistoricalRecords()
 
     def __str__(self):
