@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.utils import timezone
 
@@ -13,21 +14,30 @@ class Person(models.Model):
     last_name = models.CharField(max_length=64)
     dob = models.DateField(help_text="Date of Birth", blank=True, null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
-    dependent_on = models.ForeignKey('Client', related_name='household',
-            on_delete=models.CASCADE, null=True)
-    history = HistoricalRecords()
 
     @property
-    def name(self):
+    def name(self) -> str:
         if self.last_name:
             return " ".join((self.first_name, self.last_name))
         return self.first_name
+
+    @property
+    def age(self) -> int:
+        """The person's age in years."""
+        today = date.today()
+        return today.year - self.dob.year - ((today.month, today.day) < (self.dob.month, self.dob.day))
 
     def __str__(self):
         return self.name
 
 
-class Client(models.Model):
+class Dependent(Person):
+    dependent_on = models.ForeignKey('Client', related_name='dependents',
+            on_delete=models.CASCADE,null=True)
+    history = HistoricalRecords()
+
+
+class Client(Person):
     NEW = 'NEW'
     TMP = 'TMP'
     APP = 'APP'
@@ -38,7 +48,6 @@ class Client(models.Model):
         (APP, "Application submitted"),
         (REG, "Registered"))
 
-    person = models.ForeignKey('Person', on_delete=models.CASCADE)
     address = models.CharField(max_length=128, blank=True, null=True,
             help_text="Street Address")
     city = models.CharField(max_length=64, blank=True, null=True)
@@ -48,15 +57,11 @@ class Client(models.Model):
     tempId = models.CharField(max_length=32, blank=True, null=True)
     photo = models.ImageField(null=True)
 
-    reg_notes = models.TextField(default="",
+    reg_notes = models.CharField(default="", max_length=256,
             blank=True, null=True, help_text="Registration notes")
-    notes = models.TextField(default="",
+    notes = models.CharField(default="", max_length=256,
             blank=True, null=True, help_text="General notes")
     history = HistoricalRecords()
-
-    @property
-    def name(self):
-        return self.person.name
 
     def id_number(self):
         if self.newId:
@@ -68,19 +73,19 @@ class Client(models.Model):
         return ""
 
     def last_visit(self):
-        return self.visit_set.latest('visited_at').visited_at.date()
+        return self.visits.latest('visited_at').visited_at.date()
 
     def __str__(self):
-        return "{} [{}]".format(str(self.person), self.id_number())
+        return "{} [{}]".format(self.name, self.id_number())
 
     class Meta:
-        ordering = ['person']
+        ordering = ['id']
 
 
 class Visit(models.Model):
     client = models.ForeignKey('Client', related_name='visits')
-    visited_at = models.DateTimeField(default=timezone.now)
-    picked_up_by = models.ForeignKey('Client', null=True)
+    visited_at = models.DateTimeField(blank=True)
+    picked_up_by = models.ForeignKey('Client', related_name='pickups', null=True)
     history = HistoricalRecords()
 
     def __str__(self):

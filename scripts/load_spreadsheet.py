@@ -18,7 +18,7 @@ from openpyxl.utils import coordinate_to_tuple
 
 import django
 django.setup()
-from clients.models import Person, Client, Visit
+from clients.models import Dependent, Client, Visit
 
 # Constants
 CURRENT_SHEET = 'New Data'
@@ -81,23 +81,21 @@ def load_spreadsheet(infile, dryrun=False):
 
     # Load client data, row by row
     for row in ws.iter_rows(min_row=2):
-        last_name, first_name, gender, dob = [c.value for c in row[:4]]
-        address, city = [c.value for c in row[4:6]]
-
+        last_name, first_name, gender, dob, address, city = [
+                c.value for c in row[:6]]
         if not (first_name and last_name):
             break
-        person = Person(last_name=last_name, first_name=first_name,
-                gender=gender, dob=dob)
-        person.save()
 
         newId = row[newid_idx].value
         idNotes = row[idNotes_idx].value
         distNotes = row[distNotes_idx].value
-        client = Client(person=person, address=address, city=city,
+
+        client = Client( last_name=last_name, first_name=first_name,
+                gender=gender, dob=dob, address=address, city=city,
                 newId=newId, notes=distNotes, reg_notes=idNotes)
         client.save()
 
-        household_count = 0
+        dependents = []
         for idx in range(6, 27, 3):
             name, gender, dob = [c.value for c in row[idx:idx+3]]
             if not name:
@@ -106,26 +104,25 @@ def load_spreadsheet(infile, dryrun=False):
                 last_name, first_name = name.split(', ', 1)
             else:
                 first_name, last_name = name, ""
-            household_count += 1
-            person = Person(last_name=last_name, first_name=first_name,
+            dependent = Dependent(last_name=last_name, first_name=first_name,
                     gender=gender, dob=dob, dependent_on=client)
-            person.save()
+            dependents.append(dependent)
+            dependent.save()
 
-        visit_count = 0
+        visits = []
         for idx, visit_date in visit_cols:
             if row[idx].value:
                 assert row[idx].value.lower() == 'x'
                 visit = Visit(client=client, visited_at=visit_date)
-                visit_count += 1
+                visits.append(visit)
                 visit.save()
 
         log.debug("Loaded client {}:\t{}\t{} dependents\t{} visits".format(
-            client.id, client, client.household.count(), visit_count))
-
+            client.id, client, len(dependents), len(visits)))
 
 
 def reset_database():
-    Person.objects.all().delete()
+    Dependent.objects.all().delete()
     Client.objects.all().delete()
     Visit.objects.all().delete()
 
