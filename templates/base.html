@@ -8,46 +8,61 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <link href="{% static "directory/base.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "pantry/base.css" %}" rel="stylesheet" type="text/css">
 {% block styles %}
 {% endblock %}
 {% block scripts %}
 {% endblock %}
   </head>
   <!--
-  <body background="{% static "directory/images/bg.gif" %}">
+  <body background="{% static "pantry/images/bg.gif" %}">
    -->
   <body>
       <div id="banner" class="container">
-          <div class="span12">
-          <div class="banner-title">
-          <h1>Our Lady of Sorrows School Directory</h1>
+          <div class="row">
+          <h1>OLS Food Pantry</h1>
           </div>
           </div>
       </div>
-      <div class="container">
-          <div id="topnavbar" class="navbar navbar-inverse">
-              <div class="navbar-inner">
-                  <ul class="nav">
-                      <li><a href="{{ root_url }}">Home</a></li>
-                      <li><a href="{{ root_url }}contacts/classes/">Classes</a></li>
-                      <li><a href="{{ root_url }}contacts/families/">Families</a></li>
-                      <li><a href="{{ root_url }}contacts/students/">Students</a></li>
-                      <li><a href="{{ root_url }}contacts/adults/">Adults</a></li>
-                  </ul>
-                  <ul class="nav pull-right">
-                      <li><a href="{{ root_url }}admin/">Admin</a></li>
-                  </ul>
-              </div>
-          </div>
-          <div id="sidebar">
-          </div>
-          <div id="content">
-              {% block content %}
-              <p>Hello world!</p>
-              <p>ROOT_URL: {{ root_url }}</p>
-              {% endblock %}
-          </div>
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+            aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+          
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+            <a class="nav-link" href="{{ root_url }}/">Home</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ root_url }}/about/">About</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ root_url }}/stats/">Stats</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#">Distributions</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#">Clients</a>
+            </li>
+          </ul>
+          <form class="form-inline my-2 my-md-0">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        </div>
+      </nav>
+      <div id="sidebar">
+      </div>
+      <div id="content" class="container">
+        <div id="maintext" class="span9 offset1 whitebkg">
+          {% block content %}
+          <p>Your content here!</p>
+          <p>ROOT_URL: {{ root_url }}</p>
+          {% endblock %}
+        </div>
       </div>
       <div id="footer" class="container">
       </div>

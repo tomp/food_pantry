@@ -1,0 +1,23 @@
+#banner h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: #eeeeee;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+body {
+    background-color: #195c95;
+}
+#content {
+    padding-top: 20px;
+}
+.whitebkg {
+    background-color: #fff;
+}
+#maintext {
+    padding: 20px;
+}
+#maintext h2 {
+    font-weight: bold;
+    color: #333399;
+}
