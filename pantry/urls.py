@@ -23,10 +23,10 @@ import clients.views
 
 
 urlpatterns = [
-    url(r'^/?$', views.home, name='home'),
+    url(r'^$', views.home, name='home'),
     url(r'^about/?', flatpage, {'url': '/about/'}, name='about'),
-    url(r'^stats/?', flatpage, {'url': '/stats/'}, name='stats'),
-    # url(r'^visits/', clients.views.visits, name='brackets'),
+    # url(r'^stats/', clients.views.stats, name='stats'),
+    # url(r'^visits/', clients.views.visits, name='visits'),
     # url(r'^clients/', clients.views.summary, name='summary'),
     url(r'^admin/?', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
