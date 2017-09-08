@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Dependent, Client, Visit
 
+from clients.models import Dependent, Client, Visit
+from pantry.admin import admin_site
 
 class DependentInlineAdmin(admin.TabularInline):
     model = Dependent
@@ -14,11 +15,12 @@ class VisitInlineAdmin(admin.TabularInline):
     show_change_link = True
     extra = 1
 
-@admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('name', 'id_number', 'last_visit', 'notes')
     inlines = [VisitInlineAdmin, DependentInlineAdmin]
 
-@admin.register(Visit)
 class VisitAdmin(admin.ModelAdmin):
     date_hierarchy = 'visited_at'
+
+admin_site.register(Client, ClientAdmin)
+admin_site.register(Visit, VisitAdmin)

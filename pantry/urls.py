@@ -14,12 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import include, url
-from django.contrib import admin
 from django.conf.urls.static import static
 from django.contrib.flatpages.views import flatpage
 from django.conf import settings
 from . import views
 import clients.views
+
+from pantry.admin import admin_site
 
 
 urlpatterns = [
@@ -31,7 +32,7 @@ urlpatterns = [
     # url(r'^stats/', clients.views.stats, name='stats'),
     # url(r'^visits/', clients.views.visits, name='visits'),
     # url(r'^clients/', clients.views.summary, name='summary'),
-    url(r'^admin/?', admin.site.urls),
+    url(r'^admin/?', admin_site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
