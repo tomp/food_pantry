@@ -19,12 +19,25 @@
    -->
   <body>
       <div id="banner" class="container">
-          <div class="row">
-          <h1>OLS Food Pantry</h1>
-          </div>
+          <div class="row justify-content-between align-items-end">
+            <div class="col-auto">
+              <h1>OLS Food Pantry</h1>
+            </div>
+            <div class="col-auto">
+              {% if user.is_staff %}
+              <a style="text-align=right color=#aaa" href="/admin/">Admin</a>
+              &nbsp;&nbsp;|&nbsp;&nbsp;
+              {% endif %}
+              {% if user.is_authenticated %}
+              <a style="text-align=right color=#aaa" href="/accounts/logout/?next={{ request.path }}">Log out</a>
+              {% else %}
+              <a style="text-align=right color=#aaa" href="/accounts/login/?next={{ request.path }}">Log in</a>
+              {% endif %}
+            </div>
           </div>
       </div>
-      <nav class="navbar navbar-toggleable-sm navbar-expand-md navbar-dark bg-dark">
+      <div class="container">
+      <nav class="navbar navbar-toggleable-sm navbar-expand-md navbar-dark bg-dark ">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent"
             aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -47,7 +60,7 @@
             <li class="nav-item">
               <a class="nav-link disabled" href="#">Clients</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item float-right">
             <a class="nav-link" href="{{ root_url }}/admin/">Admin</a>
             </li>
           </ul>
@@ -57,14 +70,16 @@
           </form>
         </div>
       </nav>
+      </div>
       <div id="sidebar">
       </div>
       <div id="content" class="container">
-        <div id="maintext" class="span9 offset1 whitebkg">
-          {% block content %}
-          <p>Your content here!</p>
-          <p>ROOT_URL: {{ root_url }}</p>
-          {% endblock %}
+        <div id="maintext" class="row span9 offset1 whitebkg">
+            {% block content %}
+            <p>Your content here!</p>
+            <p>ROOT_URL: {{ root_url }}</p>
+            {% endblock %}
+          </div>
         </div>
       </div>
       <div id="footer" class="container">
