@@ -1,8 +1,4 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.template import RequestContext, loader
+from django.views.generic.base import TemplateView
 
-def home(request):
-    template = loader.get_template('home.html')
-    context = RequestContext(request,{}).flatten()
-    return HttpResponse(template.render(context))
+class HomePageView(TemplateView):
+    template_name = "home.html"

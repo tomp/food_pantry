@@ -19,6 +19,16 @@ class Person(models.Model):
             return " ".join((self.first_name, self.last_name))
         return self.first_name
 
+    def truncated_name(self, max_length=0):
+        if max_length and self.last_name:
+            length = max_length - len(self.last_name)
+        else:
+            length = max_length
+        if max_length and len(self.name) > max_length:
+            return self.first_name[:max_length-3] + "... " + self.last_name
+        else:
+            return self.name
+
     @property
     def age(self) -> int:
         """The person's age in years."""
@@ -67,6 +77,13 @@ class Client(Person):
         elif self.tempId:
             return "temp #{}".format(self.tempId)
         return ""
+
+    def truncated_notes(self, max_length=0):
+        notes = self.notes or ""
+        if max_length and len(notes) > max_length:
+            return notes[:max_length-2] + "..."
+        else:
+            return notes
 
     def last_visit(self):
         return self.visits.latest('visited_at').visited_at.date()

@@ -26,14 +26,10 @@ from pantry.admin import admin_site
 
 
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
-    url(r'^about/?', flatpage, {'url': '/about/'}, name='about'),
+    url(r'^$', views.HomePageView.as_view(), name='home'),
+    url(r'^about/', flatpage, {'url': '/about/'}, name='about'),
     url(r'^stats/', flatpage, {'url': '/stats/'}, name='stats'),
-    url(r'^visits/', flatpage, {'url': '/visits/'}, name='visits'),
-    url(r'^clients/', flatpage, {'url': '/clients/'}, name='clients'),
-    # url(r'^stats/', clients.views.stats, name='stats'),
-    # url(r'^visits/', clients.views.visits, name='visits'),
-    # url(r'^clients/', clients.views.summary, name='summary'),
+    url(r'^clients/', clients.views.ClientListView.as_view(), name='clients'),
     url(r'^admin/?', admin_site.urls),
     url(r'^accounts/login/$', auth_views.LoginView.as_view(), name='login'),
     url(r'^accounts/logout/$', auth_views.LogoutView.as_view(), name='logout'),

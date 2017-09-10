@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'debug_toolbar',
-    'simple_history',
     'clients',
 ]
 
@@ -59,6 +58,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'pantry.urls'
+APPEND_SLASH = True
 
 TEMPLATES = [
     {
