@@ -7,7 +7,7 @@
     <tr>
         <th class="colhead">#</th>
         <th class="colhead">Name</th>
-        <th class="colhead">ID</th>
+        <th class="colhead">Reg#</th>
         <th class="colhead">Notes</th>
     </tr>
   </thead>
@@ -15,8 +15,8 @@
       {% for client in clients %}
       <tr class="clientrow">
           <td>{{ client.id }}</td>
-          <td>{{ client.name }}</td>
-          <td>{{ client.pantry_id }}</td>
+          <td><a href="{{ client.url }}">{{ client.name }}</a></td>
+          <td>{{ client.regnum }}</td>
           <td>{{ client.notes }}</td>
       </tr>
       {% endfor %}

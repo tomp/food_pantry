@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^$', views.HomePageView.as_view(), name='home'),
     url(r'^about/', flatpage, {'url': '/about/'}, name='about'),
     url(r'^stats/', flatpage, {'url': '/stats/'}, name='stats'),
+    url(r'^clients/(?P<pk>[0-9]+)/', clients.views.ClientDetailView.as_view(), name='client'),
     url(r'^clients/', clients.views.ClientListView.as_view(), name='clients'),
     url(r'^admin/?', admin_site.urls),
     url(r'^accounts/login/$', auth_views.LoginView.as_view(), name='login'),
